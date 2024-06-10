@@ -53,7 +53,7 @@ export class AuthController {
     @Response() res
   ){
     res.clearCookie('token');
-    res.status(200).json({
+    res.status(200).json({  
       message:'logout successful'
     })
   }
