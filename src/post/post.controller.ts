@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Request, Response, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Request, Response, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtService } from '@nestjs/jwt';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -67,6 +67,28 @@ export class PostController {
       const updatedPost = await this.postService.updatePost(postId, updateDto, userId);
       res.status(200).json({
         updatedPost
+      });
+    } catch (error) {
+      res.status(error.status || 500).json({
+        message: error.message || 'Internal server error',
+      });
+    }
+  }
+
+
+  @Delete('/delete/:id')
+  @UseGuards(JwtGuard)
+  async deletePost(
+    @Request() req,
+    @Response() res,
+    @Param('id') postId: string
+  ): Promise<any> {
+    try {
+      const decoded = await this._jwt.decode(req.cookies['token']);
+      const userId = decoded.user;
+      await this.postService.deletePost(postId, userId);
+      res.status(200).json({
+        message: 'Post deleted successfully'
       });
     } catch (error) {
       res.status(error.status || 500).json({
